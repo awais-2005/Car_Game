@@ -13,23 +13,50 @@
             <h1>Car Dodge</h1>
             <div class="menu-section">
                 <label for="laneSelect">Number of Lanes:</label>
-                <select id="laneSelect">
-                    <option value="2">2 Lanes</option>
-                    <option value="3" selected>3 Lanes</option>
-                    <option value="4">4 Lanes</option>
-                    <option value="5">5 Lanes</option>
-                    <option value="6">6 Lanes</option>
-                    <option value="7">7 Lanes</option>
-                    <option value="8">8 Lanes</option>
-                </select>
+                <!-- Replaced basic select with custom dropdown -->
+                <div class="custom-dropdown" id="laneDropdown">
+                    <div class="dropdown-selected" data-value="3">
+                        <span>3 Lanes</span>
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option" data-value="2">2 Lanes</div>
+                        <div class="dropdown-option" data-value="3">3 Lanes</div>
+                        <div class="dropdown-option" data-value="4">4 Lanes</div>
+                        <div class="dropdown-option" data-value="5">5 Lanes</div>
+                        <div class="dropdown-option" data-value="6">6 Lanes</div>
+                        <div class="dropdown-option" data-value="7">7 Lanes</div>
+                        <div class="dropdown-option" data-value="8">8 Lanes</div>
+                    </div>
+                </div>
             </div>
             <div class="menu-section">
                 <label for="difficultySelect">Difficulty:</label>
-                <select id="difficultySelect">
-                    <option value="easy">Easy</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
+                <!-- Replaced basic select with custom dropdown -->
+                <div class="custom-dropdown" id="difficultyDropdown">
+                    <div class="dropdown-selected" data-value="medium">
+                        <span>Medium</span>
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option" data-value="easy">
+                            <span class="difficulty-icon">🟢</span>
+                            <span>Easy</span>
+                        </div>
+                        <div class="dropdown-option" data-value="medium">
+                            <span class="difficulty-icon">🟡</span>
+                            <span>Medium</span>
+                        </div>
+                        <div class="dropdown-option" data-value="hard">
+                            <span class="difficulty-icon">🔴</span>
+                            <span>Hard</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <button id="startGame" class="btn">Start Game</button>
         </div>
