@@ -5,19 +5,17 @@
 }
 
 body {
-  position: relative;
   font-family: "Arial", sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   height: 100vh;
-  width: 100%;
   overflow: hidden;
   touch-action: manipulation;
 }
 
 #gameContainer {
-  position: absolute;
+  position: relative;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,11 +202,14 @@ select {
 }
 
 #gameCanvas {
-  height: 100svh;
   border: 2px solid #333;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   background: #2c3e50;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
 #gameUI {
@@ -243,22 +244,6 @@ select {
 
 .power-display {
   color: #4ecdc4;
-}
-
-#gameInstructions {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  color: white;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-#gameInstructions p {
-  margin: 0.2rem 0;
 }
 
 .final-score {

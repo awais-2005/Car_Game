@@ -68,8 +68,8 @@ class CarDodgeGame {
 
   setupCanvas() {
     const container = document.getElementById("gameContainer")
-    const maxWidth = Math.min(window.innerWidth - 40, 400)
-    const maxHeight = Math.min(window.innerHeight - 100, 600)
+    const maxWidth = window.innerWidth
+    const maxHeight = window.innerHeight
 
     this.canvas.width = maxWidth
     this.canvas.height = maxHeight
