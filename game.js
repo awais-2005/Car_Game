@@ -194,7 +194,9 @@ class CarDodgeGame {
 
   setupTouchControls() {
     this.canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault()
+      if (e.cancelable) {
+        e.preventDefault()
+      }
       const touch = e.touches[0]
       const rect = this.canvas.getBoundingClientRect()
       const touchX = touch.clientX - rect.left
@@ -209,7 +211,9 @@ class CarDodgeGame {
     })
 
     this.canvas.addEventListener("touchmove", (e) => {
-      e.preventDefault()
+      if (e.cancelable) {
+        e.preventDefault()
+      }
       if (this.isDragging && this.gameState === "playing") {
         const touch = e.touches[0]
         const rect = this.canvas.getBoundingClientRect()
@@ -221,7 +225,9 @@ class CarDodgeGame {
     })
 
     this.canvas.addEventListener("touchend", (e) => {
-      e.preventDefault()
+      if (e.cancelable) {
+        e.preventDefault()
+      }
       this.isDragging = false
     })
 
