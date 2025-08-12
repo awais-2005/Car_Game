@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Dodge Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen">
+            <h1>Car Dodge</h1>
+            <div class="menu-section">
+                <label for="laneSelect">Number of Lanes:</label>
+                <select id="laneSelect">
+                    <option value="2">2 Lanes</option>
+                    <option value="3" selected>3 Lanes</option>
+                    <option value="4">4 Lanes</option>
+                    <option value="5">5 Lanes</option>
+                    <option value="6">6 Lanes</option>
+                    <option value="7">7 Lanes</option>
+                    <option value="8">8 Lanes</option>
+                </select>
+            </div>
+            <div class="menu-section">
+                <label for="difficultySelect">Difficulty:</label>
+                <select id="difficultySelect">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+            <button id="startGame" class="btn">Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen hidden">
+            <div id="gameUI">
+                <div class="ui-top">
+                    <div class="score-display">
+                        <span>Score: </span><span id="score">0</span>
+                    </div>
+                    <div class="power-display">
+                        <span>Fly Power: </span><span id="flyPower">0</span>
+                    </div>
+                    <button id="pauseBtn" class="btn-small">⏸️</button>
+                </div>
+            </div>
+            
+            <canvas id="gameCanvas"></canvas>
+            
+            <div id="gameInstructions">
+                <p>Swipe ← → to change lanes</p>
+                <p>Swipe ↑ to use fly power</p>
+            </div>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pauseMenu" class="screen hidden">
+            <h2>Game Paused</h2>
+            <button id="resumeBtn" class="btn">Resume</button>
+            <button id="mainMenuBtn" class="btn">Main Menu</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen hidden">
+            <h2>Game Over!</h2>
+            <div class="final-score">
+                <p>Final Score: <span id="finalScore">0</span></p>
+            </div>
+            <button id="playAgainBtn" class="btn">Play Again</button>
+            <button id="backToMenuBtn" class="btn">Main Menu</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
