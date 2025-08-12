@@ -11,6 +11,10 @@
         <!-- Main Menu -->
         <div id="mainMenu" class="screen">
             <h1>Car Dodge</h1>
+            <!-- Added high score display to main menu -->
+            <div class="high-score-display">
+                <p>High Score: <span id="highScore">0</span></p>
+            </div>
             <div class="menu-section">
                 <label for="laneSelect">Number of Lanes:</label>
                 <!-- Replaced basic select with custom dropdown -->
@@ -90,6 +94,8 @@
             <h2>Game Over!</h2>
             <div class="final-score">
                 <p>Final Score: <span id="finalScore">0</span></p>
+                <!-- Added high score display to game over screen -->
+                <p>High Score: <span id="gameOverHighScore">0</span></p>
             </div>
             <button id="playAgainBtn" class="btn">Play Again</button>
             <button id="backToMenuBtn" class="btn">Main Menu</button>

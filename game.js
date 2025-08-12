@@ -56,6 +56,7 @@ class CarDodgeGame {
       { color: "#ff9ff3", type: "compact" },
     ]
 
+    this.highScore = this.loadHighScore()
     this.init()
   }
 
@@ -327,6 +328,8 @@ class CarDodgeGame {
   gameOver() {
     this.gameState = "gameOver"
     document.getElementById("finalScore").textContent = this.score
+    const newHighScore = this.saveHighScore()
+    this.updateHighScoreDisplay()
     this.showScreen("gameOverScreen")
   }
 
@@ -691,6 +694,25 @@ class CarDodgeGame {
       this.roadLines.push({ y: y, height: lineHeight })
     }
   }
+
+  loadHighScore() {
+    const saved = localStorage.getItem("carDodgeHighScore")
+    return saved ? Number.parseInt(saved) : 0
+  }
+
+  saveHighScore() {
+    if (this.score > this.highScore) {
+      this.highScore = this.score
+      localStorage.setItem("carDodgeHighScore", this.highScore.toString())
+      return true // New high score achieved
+    }
+    return false
+  }
+
+  updateHighScoreDisplay() {
+    document.getElementById("highScore").textContent = this.highScore
+    document.getElementById("gameOverHighScore").textContent = this.highScore
+  }
 }
 
 // Initialize game when page loads
@@ -705,4 +727,9 @@ window.addEventListener("resize", () => {
   if (canvas && window.game) {
     window.game.setupCanvas()
   }
+})
+
+document.addEventListener("DOMContentLoaded", () => {
+  const game = new CarDodgeGame()
+  game.updateHighScoreDisplay()
 })
