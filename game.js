@@ -15,11 +15,17 @@ class CarDodgeGame {
     this.score = 0
     this.flyPower = 0
     this.playerLane = 1
+    this.targetPlayerLane = 1
+    this.playerLaneOffset = 0
+    this.laneTransitionSpeed = 0.15
     this.playerY = 0
     this.isFlying = false
     this.flyingTime = 0
     this.gameSpeed = 2
     this.baseSpeed = 2
+    this.playerSpeed = 1
+    this.speedIncreaseTimer = 0
+    this.gameTime = 0
 
     // Arrays for game objects
     this.enemyCars = []
@@ -177,14 +183,14 @@ class CarDodgeGame {
   }
 
   moveLeft() {
-    if (this.playerLane > 0) {
-      this.playerLane--
+    if (this.targetPlayerLane > 0) {
+      this.targetPlayerLane--
     }
   }
 
   moveRight() {
-    if (this.playerLane < this.lanes - 1) {
-      this.playerLane++
+    if (this.targetPlayerLane < this.lanes - 1) {
+      this.targetPlayerLane++
     }
   }
 
@@ -203,11 +209,16 @@ class CarDodgeGame {
     this.score = 0
     this.flyPower = 0
     this.playerLane = Math.floor(this.lanes / 2)
+    this.targetPlayerLane = this.playerLane
+    this.playerLaneOffset = 0
     this.isFlying = false
     this.flyingTime = 0
     this.enemyCars = []
     this.roadLines = []
     this.carSpawnTimer = 0
+    this.playerSpeed = 1
+    this.speedIncreaseTimer = 0
+    this.gameTime = 0
 
     // Set difficulty parameters
     switch (this.difficulty) {
@@ -272,40 +283,69 @@ class CarDodgeGame {
   }
 
   spawnEnemyCar() {
-    const availableLanes = []
+    const gameTimeMinutes = this.gameTime / 60000
+    const trafficComplexity = Math.min(1 + gameTimeMinutes * 0.2, 2.5)
 
-    // Find lanes that don't have cars too close to the top
-    for (let i = 0; i < this.lanes; i++) {
-      let canSpawn = true
-      for (const car of this.enemyCars) {
-        if (car.lane === i && car.y < 150) {
-          canSpawn = false
-          break
-        }
-      }
-      if (canSpawn) {
-        availableLanes.push(i)
+    const maxCarsToSpawn = Math.floor(trafficComplexity)
+    const shouldSpawnMultiple = Math.random() < 0.5 && this.lanes > 3 // Only spawn multiple if enough lanes
+    const carsToSpawn = shouldSpawnMultiple ? Math.min(maxCarsToSpawn, Math.floor(this.lanes * 0.6)) : 1
+
+    const occupiedLanes = this.enemyCars.filter((car) => car.y > -300 && car.y < 200).map((car) => car.lane)
+
+    const availableLanes = []
+    for (let lane = 0; lane < this.lanes; lane++) {
+      if (!occupiedLanes.includes(lane)) {
+        availableLanes.push(lane)
       }
     }
 
-    if (availableLanes.length > 0) {
-      const lane = availableLanes[Math.floor(Math.random() * availableLanes.length)]
-      const carType = this.carTypes[Math.floor(Math.random() * this.carTypes.length)]
+    const minFreeLanes = Math.max(1, Math.ceil(this.lanes * 0.4))
+    const maxCarsThisSpawn = Math.min(carsToSpawn, availableLanes.length - minFreeLanes)
 
-      this.enemyCars.push({
-        x: lane * this.laneWidth + this.laneWidth / 2,
-        y: -60,
-        lane: lane,
-        width: this.laneWidth * 0.7,
-        height: 60,
-        color: carType.color,
-        type: carType.type,
-        speed: this.gameSpeed + Math.random() * 0.5,
-      })
+    for (let i = 0; i < Math.max(0, maxCarsThisSpawn); i++) {
+      if (availableLanes.length > minFreeLanes) {
+        const laneIndex = Math.floor(Math.random() * availableLanes.length)
+        const lane = availableLanes[laneIndex]
+        availableLanes.splice(laneIndex, 1) // Remove from available lanes
+
+        const carType = this.carTypes[Math.floor(Math.random() * this.carTypes.length)]
+
+        const relativeSpeed = this.gameSpeed * this.playerSpeed * (0.8 + Math.random() * 0.4)
+
+        this.enemyCars.push({
+          x: lane * this.laneWidth + this.laneWidth / 2,
+          y: -60 - i * 150, // Increased spacing between multiple cars
+          lane: lane,
+          width: this.laneWidth * 0.7,
+          height: 60,
+          color: carType.color,
+          type: carType.type,
+          speed: relativeSpeed,
+        })
+      }
     }
   }
 
   updateGame(deltaTime) {
+    this.gameTime += deltaTime
+    this.speedIncreaseTimer += deltaTime
+
+    if (this.speedIncreaseTimer >= 15000) {
+      // 15 seconds
+      this.playerSpeed += 0.15
+      this.speedIncreaseTimer = 0
+    }
+
+    if (this.playerLane !== this.targetPlayerLane) {
+      const direction = this.targetPlayerLane > this.playerLane ? 1 : -1
+      this.playerLaneOffset += direction * this.laneTransitionSpeed
+
+      if (Math.abs(this.playerLaneOffset) >= 1) {
+        this.playerLane = this.targetPlayerLane
+        this.playerLaneOffset = 0
+      }
+    }
+
     // Update flying state
     if (this.isFlying) {
       this.flyingTime -= deltaTime
@@ -315,9 +355,9 @@ class CarDodgeGame {
       }
     }
 
-    // Move road lines
+    const roadSpeed = this.gameSpeed * this.playerSpeed
     this.roadLines.forEach((line) => {
-      line.y += this.gameSpeed * (deltaTime / 16)
+      line.y += roadSpeed * (deltaTime / 16)
       if (line.y > this.roadHeight + 40) {
         line.y = -40
       }
@@ -325,19 +365,21 @@ class CarDodgeGame {
 
     // Spawn enemy cars
     this.carSpawnTimer += deltaTime
-    if (this.carSpawnTimer >= this.carSpawnInterval) {
+    const dynamicSpawnInterval = this.carSpawnInterval / (1 + this.playerSpeed * 0.2) // Reduced spawn rate multiplier
+
+    if (this.carSpawnTimer >= dynamicSpawnInterval) {
       this.spawnEnemyCar()
       this.carSpawnTimer = 0
 
-      // Adjust spawn rate based on difficulty
-      const trafficMultiplier = this.difficulty === "hard" ? 0.9 : this.difficulty === "medium" ? 0.95 : 1
-      this.carSpawnInterval = Math.max(800, this.carSpawnInterval * trafficMultiplier)
+      const trafficMultiplier = this.difficulty === "hard" ? 0.95 : this.difficulty === "medium" ? 0.97 : 0.98
+      this.carSpawnInterval = Math.max(1200, this.carSpawnInterval * trafficMultiplier) // Increased minimum interval
     }
 
     // Update enemy cars
     for (let i = this.enemyCars.length - 1; i >= 0; i--) {
       const car = this.enemyCars[i]
-      car.y += car.speed * (deltaTime / 16)
+      const relativeSpeed = car.speed - this.playerSpeed * this.gameSpeed * 0.5
+      car.y += relativeSpeed * (deltaTime / 16)
 
       // Remove cars that are off screen
       if (car.y > this.roadHeight + 60) {
@@ -365,7 +407,7 @@ class CarDodgeGame {
   }
 
   checkCollisions() {
-    const playerX = this.playerLane * this.laneWidth + this.laneWidth / 2
+    const playerX = (this.playerLane + this.playerLaneOffset) * this.laneWidth + this.laneWidth / 2
     const playerWidth = this.laneWidth * 0.6
     const playerHeight = 50
 
@@ -416,20 +458,7 @@ class CarDodgeGame {
     })
 
     // Draw player car
-    const playerX = this.playerLane * this.laneWidth + this.laneWidth / 2
-    const playerWidth = this.laneWidth * 0.6
-    const playerHeight = 50
-    const playerColor = this.isFlying ? "#f39c12" : "#e74c3c"
-
-    this.ctx.save()
-    if (this.isFlying) {
-      this.ctx.globalAlpha = 0.8
-      this.ctx.shadowColor = "#f39c12"
-      this.ctx.shadowBlur = 20
-    }
-
-    this.drawCar(playerX, this.playerY, playerWidth, playerHeight, playerColor, "player")
-    this.ctx.restore()
+    this.drawPlayerCar()
   }
 
   drawCar(x, y, width, height, color, type) {
@@ -496,6 +525,42 @@ class CarDodgeGame {
     }
 
     ctx.restore()
+  }
+
+  drawPlayerCar() {
+    const x = (this.playerLane + this.playerLaneOffset) * this.laneWidth + this.laneWidth / 2
+    const width = this.laneWidth * 0.6
+    const height = 50
+
+    const flyingSizeMultiplier = this.isFlying ? 1.2 : 1
+    const finalWidth = width * flyingSizeMultiplier
+    const finalHeight = height * flyingSizeMultiplier
+
+    this.ctx.save()
+
+    // Flying effect
+    if (this.isFlying) {
+      this.ctx.shadowColor = "#00ffff"
+      this.ctx.shadowBlur = 20
+      this.ctx.globalAlpha = 0.9
+    }
+
+    // Car body
+    this.ctx.fillStyle = "#ff4444"
+    this.ctx.fillRect(x - finalWidth / 2, this.playerY - finalHeight / 2, finalWidth, finalHeight)
+
+    // Car details
+    this.ctx.fillStyle = "#ffffff"
+    this.ctx.fillRect(x - finalWidth / 3, this.playerY - finalHeight / 3, (finalWidth * 2) / 3, finalHeight / 4)
+
+    // Wheels
+    this.ctx.fillStyle = "#333333"
+    this.ctx.fillRect(x - finalWidth / 2 + 5, this.playerY - finalHeight / 2 + 5, 8, 12)
+    this.ctx.fillRect(x + finalWidth / 2 - 13, this.playerY - finalHeight / 2 + 5, 8, 12)
+    this.ctx.fillRect(x - finalWidth / 2 + 5, this.playerY + finalHeight / 2 - 17, 8, 12)
+    this.ctx.fillRect(x + finalWidth / 2 - 13, this.playerY + finalHeight / 2 - 17, 8, 12)
+
+    this.ctx.restore()
   }
 
   gameLoop(currentTime = 0) {
