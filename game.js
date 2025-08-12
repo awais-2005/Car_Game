@@ -355,13 +355,18 @@ class CarDodgeGame {
       }
     }
 
-    const roadSpeed = this.gameSpeed * this.playerSpeed
+    const roadSpeed = this.gameSpeed * this.playerSpeed * 1.5 // Increased multiplier for more noticeable effect
     this.roadLines.forEach((line) => {
       line.y += roadSpeed * (deltaTime / 16)
       if (line.y > this.roadHeight + 40) {
         line.y = -40
       }
     })
+
+    this.laneDividerOffset = (this.laneDividerOffset || 0) + roadSpeed * (deltaTime / 16)
+    if (this.laneDividerOffset > 40) {
+      this.laneDividerOffset = 0
+    }
 
     // Spawn enemy cars
     this.carSpawnTimer += deltaTime
@@ -432,10 +437,11 @@ class CarDodgeGame {
     this.ctx.fillStyle = "#34495e"
     this.ctx.fillRect(0, 0, this.roadWidth, this.roadHeight)
 
-    // Draw road lanes
+    // Draw road lanes with moving dashed lines
     this.ctx.strokeStyle = "#ecf0f1"
     this.ctx.lineWidth = 2
     this.ctx.setLineDash([20, 20])
+    this.ctx.lineDashOffset = -(this.laneDividerOffset || 0)
 
     for (let i = 1; i < this.lanes; i++) {
       const x = i * this.laneWidth
@@ -445,11 +451,10 @@ class CarDodgeGame {
       this.ctx.stroke()
     }
 
-    // Draw road lines
     this.ctx.setLineDash([])
     this.roadLines.forEach((line) => {
-      this.ctx.fillStyle = "#7f8c8d"
-      this.ctx.fillRect(this.roadWidth / 2 - 2, line.y, 4, line.height)
+      this.ctx.fillStyle = "#95a5a6"
+      this.ctx.fillRect(this.roadWidth / 2 - 3, line.y, 6, line.height)
     })
 
     // Draw enemy cars

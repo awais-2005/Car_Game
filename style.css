@@ -43,7 +43,7 @@ h1 {
   font-size: 3rem;
   margin-bottom: 2rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background-color: #ff6b6b;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -81,7 +81,7 @@ select {
   font-size: 1.2rem;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background-color: #ff6b6b;
   color: white;
   cursor: pointer;
   margin: 0.5rem;
@@ -114,6 +114,7 @@ select {
 }
 
 #gameCanvas {
+  height: 100svh;
   border: 2px solid #333;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
