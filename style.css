@@ -211,5 +211,6 @@ select {
 }
 
 .flying {
-  animation: fly 0.5s ease-in-out;
+  animation: fly 1s ease-in-out;
+  transition: all 0.2s ease;
 }
